@@ -1,243 +1,242 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include "defs.h"
 #include "pointers.h"
 
 static ptr_t *ptr = NULL;
 
-void exitPointerManager( void )
+void exitPointerManager(void)
 {
-	printf("Exit of Pointer Manager registered by atexit() function.\n");
-
-	if (! endPointerManager() )
-	{
-		printf("End of Pointer Manager Failure!\n");
-	}
+	if (endPointerManager() == FALSE) LOG(ERROR, "Pointer manager couldn't be free!");
 }
 
-bool_t initPointerManager( u32_t size )
+bool_t initPointerManager(u16_t numPointers)
+{
+	ASSERT(ptr == NULL);
+	ASSERT(numPointers > 0);
+
+	if ((numPointers == 0) || (numPointers == MAXVALUE(numPointers))) return (FALSE);
+
+	if (ptr != NULL)
+	{
+		LOG(WARNING, "Pointer manager isn't free!");
+		if (endPointerManager() == FALSE) LOG(ERROR, "Pointer manager couldn't be free!");
+	}
+
+	numPointers++;
+	ptr = CALLOC(numPointers * sizeof(ptr_t));
+
+	ASSERT(ptr != NULL);
+	if (ptr == NULL)
+	{
+		LOG(ERROR, "Memory allocation error.");
+		return (FALSE);
+	}
+
+	/* Save data at position 0 */
+	ptr[0].size = numPointers;
+	ptr[0].ptr = ptr;
+
+	return (TRUE);
+}
+
+bool_t endPointerManager(void)
+{
+	ASSERT(ptr != NULL);
+	ASSERT(ptr[0].size > 0);
+
+	if (isNotInitialized()) return (FALSE);
+
+	bool_t res = TRUE;
+
+	for (u16_t idx = 1; idx < ptr[0].size; idx++)
+	{
+		if (freeMemory(idx) == FALSE)
+		{
+			LOG(ERROR, "Memory couldn't be free.");
+			res = FALSE;
+		}
+	}
+
+	FREE(ptr);
+
+	return (res);
+}
+
+bool_t isInitialized(void)
+{
+	return ((ptr != NULL) && (ptr[0].size > 0) && (ptr[0].ptr == ptr));
+}
+
+bool_t isNotInitialized(void)
+{
+	return (! isInitialized());
+}
+
+u16_t allocMemory(const u16_t size)
 {
 	ASSERT(size > 0);
+	ASSERT(ptr != NULL);
 
-	bool_t res = FALSE;
-   if ( size > 0 )
-   {
-      size++;
+	u16_t hnd = 0;
 
-      ASSERT(ptr == NULL);
+	if (isNotInitialized() || (size == 0)) return (hnd);
 
-      if (ptr != NULL)
-      {
-         endPointerManager();
-      }
+	for (u16_t idx = 1; idx < ptr[0].size; idx++)
+	{
+		if (isFree(idx))
+		{
+			ptr[idx].ptr = CALLOC(size);
+			if (ptr[idx].ptr != NULL)
+			{
+				ptr[idx].size = size;
+				hnd = idx;
+				break;
+			}
+		}
+	}
 
-      ptr = CALLOC(size * sizeof(ptr_t));
-
-      ASSERT(ptr != NULL);
-
-      if (ptr != NULL)
-      {
-         //Save pointer data at position 0.
-         ptr[0].used = TRUE;
-         ptr[0].size = size;
-         ptr[0].ptr = ptr;
-         res = TRUE;
-      }
-   }
-   return (res);
+	return (hnd);
 }
 
-bool_t endPointerManager( void )
+bool_t freeMemory(const u16_t hnd)
 {
-   bool_t res = FALSE;
+	if (isNotValid(hnd)) return (FALSE);
 
-   ASSERT(ptr != NULL);
-   ASSERT(ptr[0].size > 0);
+	FREE(ptr[hnd].ptr);
+	ptr[hnd].size = 0;
 
-   if ((ptr != NULL) && (ptr[0].size > 0))
-   {
-      for (u32_t hnd = 1; hnd < ptr[0].size; hnd++)
-      {
-         freeMemoryHandler( hnd );
-      }
-      FREE(ptr);
-      res = TRUE;
-   }
-   return (res);
+	return (isFree(hnd));
 }
 
-bool_t isPointerManagerInitialized(void)
+bool_t isFree(const u16_t hnd)
 {
-   bool_t res = FALSE;
+	ASSERT(hnd > 0);
+	ASSERT(hnd < ptr[0].size);
 
-   ASSERT(ptr != NULL);
-
-   if (ptr != NULL)
-   {
-      res |= (ptr[0].used != FALSE);
-      res |= (ptr[0].size > 0);
-      res |= (ptr[0].ptr == ptr);
-   }
-   return ( res );
+	return ((ptr[hnd].size == 0) && (ptr[hnd].ptr == NULL));
 }
 
-u32_t allocMemoryHandler( const u32_t size )
+bool_t isNotFree(const u16_t hnd)
 {
-   u32_t hnd = 0;
-
-   ASSERT(size > 0);
-   ASSERT(ptr != NULL);
-
-   if ((size > 0) && (ptr != NULL))
-    {
-        for (u32_t i = 1; i < ptr[0].size; i++)
-        {
-            if ( isHandlerFree(i) )
-            {
-                ptr[i].used = TRUE;
-                ptr[i].size = size;
-                ptr[i].ptr = CALLOC(size);
-                if (isHanlderValid(i))
-                {
-                    hnd = i;
-                    break;
-                }
-                else
-                {
-                    freeMemoryHandler(i);
-                }
-            }
-        }
-    }
-   return (hnd);
+	return (! isFree(hnd));
 }
 
-bool_t freeMemoryHandler( const u32_t hnd )
+bool_t isValid(const u16_t hnd)
 {
-   bool_t res = FALSE;
-
-   ASSERT(ptr != NULL);
-   ASSERT(hnd > 0);
-   ASSERT(hnd < ptr[0].size);
-
-   if ((ptr != NULL) && (hnd > 0) && (hnd < ptr[0].size))
-   {
-      FREE(ptr[hnd].ptr);
-      ptr[hnd].size = 0;
-      ptr[hnd].used = FALSE;
-      res = TRUE;
-   }
-   return (res);
+	return ((hnd > 0) && (hnd < ptr[0].size));
 }
 
-bool_t isHandlerFree( const u32_t hnd )
+bool_t isNotValid(const u16_t hnd)
 {
-   bool_t res = FALSE;
-
-   ASSERT(ptr != NULL);
-   ASSERT(hnd > 0);
-   ASSERT(hnd < ptr[0].size);
-
-   if ((ptr != NULL) && (hnd > 0) && (hnd < ptr[0].size))
-   {
-       res |= (ptr[hnd].used == FALSE);
-       res |= (ptr[hnd].size == 0);
-       res |= (ptr[hnd].ptr == NULL);
-   }
-   return ( res );
+	return (! isValid(hnd));
 }
 
-bool_t isHanlderValid( const u32_t hnd )
+bool_t getPointerTo(ptr_t **p2p, const u16_t hnd)
 {
-    bool_t res = FALSE;
-
-    ASSERT(ptr != NULL);
-    ASSERT(hnd > 0);
-    ASSERT(hnd < ptr[0].size);
-
-    if ((ptr != NULL) && (hnd > 0) && (hnd < ptr[0].size))
-    {
-        res |= (ptr[hnd].used != FALSE);
-        res |= (ptr[hnd].size > 0);
-        res |= (ptr[hnd].ptr != NULL);
-    }
-    return ( res );
+	if ((p2p == NULL) || isNotValid(hnd)) return (FALSE);
+	*p2p = (ptr_t*)&ptr[hnd];
+	return (TRUE);
 }
 
-bool_t getMemoryReference( ptr_t **p, const u32_t hnd )
+u32_t getUsedSize(void)
 {
-   bool_t res = FALSE;
-   if (isHanlderValid(hnd))
-   {
-      *p = (ptr_t *)&ptr[hnd];
-      res = TRUE;
-   }
-   return (res);
+	ASSERT(ptr != NULL);
+	ASSERT(ptr[0].size > 0);
+
+	u32_t size = 0;
+
+	if ( isNotInitialized() ) return (size);
+
+	for (u16_t idx = 1; idx < ptr[0].size; idx++)
+	{
+		if (isValid(idx))
+		{
+			size += ptr[idx].size;
+		}
+	}
+
+	return (size);
 }
 
-u32_t getMemoryUsed( void )
+bool_t isPointerValid(const u16_t hnd)
 {
-    u32_t size = 0;
+	ASSERT(ptr != NULL);
+	ASSERT(hnd > 0);
+	ASSERT(hnd < ptr[0].size);
 
-    ASSERT(ptr != NULL);
-    ASSERT(ptr[0].size > 0);
+	if ( isNotInitialized() || isNotValid(hnd) ) return (FALSE);
 
-    if ((ptr != NULL) && (ptr[0].size > 0))
-    {
-        for (u32_t i = 1; i < ptr[0].size; i++)
-        {
-            if(isHanlderValid(i))
-            {
-                size += ptr[i].size;
-            }
-        }
-    }
-    return (size);
+	return ((ptr[hnd].size > 0) && (ptr[hnd].ptr != NULL));
 }
 
-u32_t getAllMemoryUsed( void )
+u32_t getAllUsedMemorySize(void)
 {
-    u32_t size = ((ptr[0].size * sizeof(ptr[0])) + getMemoryUsed());
-    return (size);
+	u32_t size = ((ptr[0].size * sizeof(ptr[0])) + getUsedSize());
+	return (size);
 }
 
-u32_t getNumHandlerFree( void )
+u16_t getFreeHandles(void)
 {
-    u32_t hnd = 0;
+	ASSERT(ptr != NULL);
+	ASSERT(ptr[0].size > 0);
 
-    ASSERT(ptr != NULL);
-    ASSERT(ptr[0].size > 0);
+	u16_t numHandles = 0;
 
-    if ((ptr != NULL) && (ptr[0].size > 0))
-    {
-        for (u32_t i = 1; i < ptr[0].size; i++)
-        {
-            if(isHandlerFree(i))
-            {
-                hnd++;
-            }
-        }
-    }
-    return (hnd);
+	if ( isNotInitialized() ) return (numHandles);
+
+	for (u16_t idx = 1; idx < ptr[0].size; idx++)
+	{
+		if (isFree(idx))
+		{
+			numHandles++;
+		}
+	}
+
+	return (numHandles);
 }
 
-u32_t getNumHandlerUsed( void )
+u16_t getUsedHandles(void)
 {
-    u32_t hnd = 0;
+	ASSERT(ptr != NULL);
+	ASSERT(ptr[0].size > 0);
 
-    ASSERT(ptr != NULL);
-    ASSERT(ptr[0].size > 0);
+	u16_t numHandles = 0;
 
-    if ((ptr != NULL) && (ptr[0].size > 0))
-    {
-        for (u32_t i = 1; i < ptr[0].size; i++)
-        {
-            if(isHanlderValid(i))
-            {
-                hnd++;
-            }
-        }
-    }
-    return (hnd);
+	if ( isNotInitialized() ) return (numHandles);
+
+	for (u16_t idx = 1; idx < ptr[0].size; idx++)
+	{
+		if (isNotFree(idx)) numHandles++;
+	}
+
+	return (numHandles);
+}
+
+bool_t memCopyTo(BYTE *pdata, WORD size_orig, WORD offset_orig, WORD data_size, WORD hnd, WORD size_dest, WORD offset_dest)
+{
+	if (isNotInitialized() || isNotValid(hnd) || (pdata == NULL))
+	{
+		LOG(ERROR, "Invalid parameter.");
+		return (FALSE);
+	}
+
+	if ((offset_orig + data_size) > size_orig)
+	{
+		LOG(ERROR, "Overflow on source buffer.");
+		return (FALSE);
+	}
+
+	if ((offset_dest + data_size) > size_dest)
+	{
+		LOG(ERROR, "Overflow on destination buffer.");
+		return (FALSE);
+	}
+
+
+	memcpy( (void*)(ptr[hnd].ptr + offset_dest), (void*)(pdata + offset_orig), data_size );
+
+	return (FALSE);
 }

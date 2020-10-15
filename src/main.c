@@ -14,35 +14,35 @@ int main()
         printf("pointers manager initialized.\n");
     }
 
-    if (isPointerManagerInitialized())
+    if (isInitialized())
     {
         printf("Successful pointers manager initialization.\n");
     }
 
-    printf("handlers free:%u\n", getNumHandlerFree());
-    printf("handlers used:%u\n", getNumHandlerUsed());
-    printf("total memory used by pointers manager structure:%u\n", getMemoryUsed());
+    printf("handlers free:%u\n", getFreeHandles());
+    printf("handlers used:%u\n", getUsedHandles());
+    printf("total memory used:%u\n", getUsedSize());
+    printf("total memory used by pointers manager structure:%u\n", getAllUsedMemorySize());
 
-    hndPointer = allocMemoryHandler( 128 );
+    hndPointer = allocMemory( 128 );
 
-    if (isHanlderValid(hndPointer))
+    if (isValid(hndPointer))
     {
         printf("checked pointer handler (%u) is valid.\n", hndPointer);
     }
 
     ptr_t *ptr = NULL;
 
-    if ( getMemoryReference( &ptr, hndPointer ) )
+    if ( getPointerTo( &ptr, hndPointer ) )
     {
         printf("checked get pointer structure by handler.\n");
         printf("ptr size: %u\n",ptr->size);
-        printf("ptr used: %d\n",ptr->used);
     }
     
-    printf("handlers free:%u\n", getNumHandlerFree());
-    printf("handlers used:%u\n", getNumHandlerUsed());
-    printf("total memory used:%u\n", getMemoryUsed());
-    printf("all memory used by pointers manager structure:%u\n", getAllMemoryUsed());
+    printf("handlers free:%u\n", getFreeHandles());
+    printf("handlers used:%u\n", getUsedHandles());
+    printf("total memory used:%u\n", getUsedSize());
+    printf("all memory used by pointers manager structure:%u\n", getAllUsedMemorySize());
 
     printf("main program is running...\n");
 

@@ -60,6 +60,13 @@ typedef unsigned long long int QWORD;	//!< 64-bit
 #define MAXVALUE(var) ((2 ^ (sizeof( var ) * 8)) - 1) //!< Calc maximum size of an integer variable.
 
 /**
+ * @brief Macro to send a log debug message to stderr.
+ */
+#define ERROR   "ERROR: "
+#define WARNING "WARNING: "
+#define LOG(state, text) fprintf(stderr, state text " - File:%s - Line:%d - Function:%s\n", __FILE__, __LINE__, __ASSERT_FUNCTION)
+
+/**
  * @brief Macro to use assert diretive on debug mode.
  */
 #if defined (DEBUG3)	//!< Enable assert directive
@@ -105,7 +112,6 @@ typedef unsigned long long int QWORD;	//!< 64-bit
 #pragma pack(1)
 typedef struct
 {
-   bool_t used;	//!< Flag for used / unused state.
    u16_t  size;	//!< Size of allocated memory, for idx 0 it mean num of entrie points.
    void  *ptr;	//!< Pointer to memory block, for idx 0 it point to itself.
 } ptr_t;		//!< Structure to manage memory allocation.
