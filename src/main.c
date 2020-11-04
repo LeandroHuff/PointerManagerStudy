@@ -3,8 +3,11 @@
 #include "defs.h"
 #include "pointers.h"
 
-int main()
+int main( int argc, char **argv )
 {
+	UNUSED(argc);
+	UNUSED(argv);
+
 	atexit ( exitPointerManager );
 
     u32_t hndPointer = 0;

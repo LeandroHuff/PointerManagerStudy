@@ -9,7 +9,7 @@ static ptr_t *ptr = NULL;
 
 void exitPointerManager(void)
 {
-	if (endPointerManager() == FALSE) LOG(ERROR, "Pointer manager couldn't be free!");
+	if (endPointerManager() == FALSE) ERROR("Pointer manager couldn't be free!");
 }
 
 bool_t initPointerManager(u16_t numPointers)
@@ -21,8 +21,8 @@ bool_t initPointerManager(u16_t numPointers)
 
 	if (ptr != NULL)
 	{
-		LOG(WARNING, "Pointer manager isn't free!");
-		if (endPointerManager() == FALSE) LOG(ERROR, "Pointer manager couldn't be free!");
+		WARNING("Pointer manager isn't free!");
+		if (endPointerManager() == FALSE) LOG("Pointer manager couldn't be free!");
 	}
 
 	numPointers++;
@@ -31,7 +31,7 @@ bool_t initPointerManager(u16_t numPointers)
 	ASSERT(ptr != NULL);
 	if (ptr == NULL)
 	{
-		LOG(ERROR, "Memory allocation error.");
+		ERROR("Memory allocation error.");
 		return (FALSE);
 	}
 
@@ -55,7 +55,7 @@ bool_t endPointerManager(void)
 	{
 		if (freeMemory(idx) == FALSE)
 		{
-			LOG(ERROR, "Memory couldn't be free.");
+			ERROR("Memory couldn't be free.");
 			res = FALSE;
 		}
 	}
@@ -80,7 +80,7 @@ u16_t allocMemory(const u16_t size)
 	ASSERT(size > 0);
 	ASSERT(ptr != NULL);
 
-	u16_t hnd = 0;
+	u16_t hnd = 0;	//!< start with an invalid handle number (0)
 
 	if (isNotInitialized() || (size == 0)) return (hnd);
 
@@ -219,19 +219,19 @@ bool_t memCopyTo(BYTE *pdata, WORD size_orig, WORD offset_orig, WORD data_size, 
 {
 	if (isNotInitialized() || isNotValid(hnd) || (pdata == NULL))
 	{
-		LOG(ERROR, "Invalid parameter.");
+		ERROR("Invalid parameter.");
 		return (FALSE);
 	}
 
 	if ((offset_orig + data_size) > size_orig)
 	{
-		LOG(ERROR, "Overflow on source buffer.");
+		ERROR("Overflow on source buffer.");
 		return (FALSE);
 	}
 
 	if ((offset_dest + data_size) > size_dest)
 	{
-		LOG(ERROR, "Overflow on destination buffer.");
+		ERROR("Overflow on destination buffer.");
 		return (FALSE);
 	}
 

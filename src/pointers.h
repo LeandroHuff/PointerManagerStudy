@@ -3,12 +3,17 @@
 #include "defs.h"
 /**
  * @brief				Function to initialize pointer manager structure.
- * @param	numPointers	Numbers of entrie points to be allocated.
+ * @param	numPointers	Numbers of entries points to be allocated.
  * @return	TRUE		Successful
  * 			FALSE		Error
  */
 bool_t initPointerManager( u16_t numPointers );
 
+/**
+ * @brief				Function called at exit main program. Here we can
+ * 						put deinitialize pointer memory for recovery allocated
+ * 						memory at a fault or unexpected program stop.
+ */
 void exitPointerManager( void );
 
 /**

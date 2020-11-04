@@ -60,11 +60,23 @@ typedef unsigned long long int QWORD;	//!< 64-bit
 #define MAXVALUE(var) ((2 ^ (sizeof( var ) * 8)) - 1) //!< Calc maximum size of an integer variable.
 
 /**
- * @brief Macro to send a log debug message to stderr.
+ * Log information messages
  */
-#define ERROR   "ERROR: "
-#define WARNING "WARNING: "
-#define LOG(state, text) fprintf(stderr, state text " - File:%s - Line:%d - Function:%s\n", __FILE__, __LINE__, __ASSERT_FUNCTION)
+typedef enum log_e
+{
+	INF,
+	WARN,
+	ERR,
+	FATAL
+} log_et;
+
+void Log(const log_et type, const char *status, const char *text, const char *file, const int line, const char *function);
+
+#define INFO(msg)    Log(  INF,    "INFO:", msg, __FILE__, __LINE__, __ASSERT_FUNCTION)
+#define LOG(msg)     Log(  INF,    "INFO:", msg, __FILE__, __LINE__, __ASSERT_FUNCTION)
+#define WARNING(msg) Log( WARN, "WARNING:", msg, __FILE__, __LINE__, __ASSERT_FUNCTION)
+#define ERROR(msg)   Log(  ERR,   "ERROR:", msg, __FILE__, __LINE__, __ASSERT_FUNCTION)
+#define FATAL(msg)   Log(FATAL,   "FATAL:", msg, __FILE__, __LINE__, __ASSERT_FUNCTION)
 
 /**
  * @brief Macro to use assert diretive on debug mode.
