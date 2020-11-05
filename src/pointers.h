@@ -1,6 +1,19 @@
 #ifndef POINTERS_H
 #define POINTERS_H
 #include "defs.h"
+
+/**
+ * @brief Structure to declare an array of entrie points for memory management.
+ */
+#pragma pack(1)
+typedef struct
+{
+   u16_t  size;	//!< Size of block memory, at 0 position it mean number of entries point.
+   void  *ptr;	//!< Pointer to memory block, for index 0 it point to itself.
+} ptr_t;		//!< Structure to manage memory allocation.
+#pragma pack()
+
+
 /**
  * @brief				Function to initialize pointer manager structure.
  * @param	numPointers	Numbers of entries points to be allocated.
@@ -123,6 +136,19 @@ u16_t getFreeHandles( void );
  * 			0 No handlers used or pointer manager not initialized.
  */
 u16_t getUsedHandles( void );
+
+/**
+ * @brief Function to copy an amount of data bytes from a buffer memory to a
+ *        buffer space handled by pointer manager.
+ * @param *pdata      Pointer to origin data buffer.
+ * @param size_orig   Origin data buffer.
+ * @param offset_orig Offset of origin data.
+ * @param data_size   Amount of data to be copied.
+ * @param hnd         Destination handler number.
+ * @param offset_dest Offset of destination buffer where data will be copied.
+ * @return bool_t     TRUE for successful, otherwise FALSE for error.
+ */
+bool_t memCopyTo(BYTE *pdata, WORD size_orig, WORD offset_orig, WORD data_size, WORD hnd, WORD offset_dest);
 
 #endif /* POINTERS_H */
 

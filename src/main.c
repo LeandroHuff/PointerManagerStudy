@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "defs.h"
 #include "pointers.h"
+#include "debug.h"
 
 int main( int argc, char **argv )
 {

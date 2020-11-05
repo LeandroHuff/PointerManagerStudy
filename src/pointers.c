@@ -4,6 +4,7 @@
 #include <assert.h>
 #include "defs.h"
 #include "pointers.h"
+#include "debug.h"
 
 static ptr_t *ptr = NULL;
 
@@ -22,7 +23,7 @@ bool_t initPointerManager(u16_t numPointers)
 	if (ptr != NULL)
 	{
 		WARNING("Pointer manager isn't free!");
-		if (endPointerManager() == FALSE) LOG("Pointer manager couldn't be free!");
+		if (endPointerManager() == FALSE) ERROR("Pointer manager couldn't be free!");
 	}
 
 	numPointers++;
@@ -36,8 +37,8 @@ bool_t initPointerManager(u16_t numPointers)
 	}
 
 	/* Save data at position 0 */
-	ptr[0].size = numPointers;
-	ptr[0].ptr = ptr;
+	ptr[0].size = numPointers; //Store number of pointers.
+	ptr[0].ptr = ptr; //Point to itself.
 
 	return (TRUE);
 }
@@ -215,7 +216,7 @@ u16_t getUsedHandles(void)
 	return (numHandles);
 }
 
-bool_t memCopyTo(BYTE *pdata, WORD size_orig, WORD offset_orig, WORD data_size, WORD hnd, WORD size_dest, WORD offset_dest)
+bool_t memCopyTo(BYTE *pdata, WORD size_orig, WORD offset_orig, WORD data_size, WORD hnd, WORD offset_dest)
 {
 	if (isNotInitialized() || isNotValid(hnd) || (pdata == NULL))
 	{
@@ -229,7 +230,7 @@ bool_t memCopyTo(BYTE *pdata, WORD size_orig, WORD offset_orig, WORD data_size, 
 		return (FALSE);
 	}
 
-	if ((offset_dest + data_size) > size_dest)
+	if ((offset_dest + data_size) > ptr[hnd].size)
 	{
 		ERROR("Overflow on destination buffer.");
 		return (FALSE);
