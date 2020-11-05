@@ -13,9 +13,10 @@
 #include "defs.h"
 
 #ifdef DEBUG
-//#define DEBUG_LEVEL_0	1	//!< Disabled debug check.
-//#define DEBUG_LEVEL_1	1	//!< Parameters check.
-//#define DEBUG_LEVEL_2	1	//!< Parameters and variable value check.
+//#define DEBUG0	1	//!< Disabled debug check.
+//#define DEBUG1	1	//!< Parameters check.
+//#define DEBUG2	1	//!< Parameters and variable value check.
+//#define DEBUG3	1	//!< Parameters and variable value check.
 #endif
 
 /**
