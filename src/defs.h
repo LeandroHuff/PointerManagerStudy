@@ -42,7 +42,7 @@ typedef enum
  * @brief Macros used to define structures and buffers.
  */
 #define DEF_VAR(type, var) type var; memset(&var, (BYTE)0, sizeof(var)) //!< Declare a variable or structure into memory and clear itself.
-#define DEF_BUFFER(type, name, size) type name[size]; memset(name, (BYTE)0, size) //!< Declare a buffer into memory and clear itself.
+#define DEF_BUFFER(type, buffer, elements) type buffer[elements]; memset(buffer, (BYTE)0, sizeof(buffer)) //!< Declare a buffer into memory and clear itself.
 
 /**
  * @brief Macros used to alloc block memory or release them.

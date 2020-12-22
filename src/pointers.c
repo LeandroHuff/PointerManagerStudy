@@ -10,7 +10,14 @@ static ptr_t *ptr = NULL;
 
 void exitPointerManager(void)
 {
-	if (endPointerManager() == FALSE) ERROR("Pointer manager couldn't be free!");
+	if (endPointerManager() == FALSE)
+   {
+      ERROR("Pointer manager couldn't be free!");
+   }
+   else
+   {
+      INFO("Successful pointer manager deallocation.");
+   }
 }
 
 bool_t initPointerManager(u16_t numPointers)
@@ -237,7 +244,7 @@ bool_t memCopyTo(BYTE *pdata, WORD size_orig, WORD offset_orig, WORD data_size, 
 	}
 
 
-	memcpy( (void*)(ptr[hnd].ptr + offset_dest), (void*)(pdata + offset_orig), data_size );
+	memcpy( (void*)((BYTE*)ptr[hnd].ptr + offset_dest), (void*)(pdata + offset_orig), data_size );
 
 	return (FALSE);
 }

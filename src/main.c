@@ -4,6 +4,7 @@
 #include "pointers.h"
 #include "debug.h"
 
+
 int main( int argc, char **argv )
 {
 	UNUSED(argc);
@@ -42,15 +43,23 @@ int main( int argc, char **argv )
         printf("checked get pointer structure by handler.\n");
         printf("ptr size: %u\n",ptr->size);
     }
-    
+
     printf("handlers free:%u\n", getFreeHandles());
     printf("handlers used:%u\n", getUsedHandles());
     printf("total memory used:%u\n", getUsedSize());
     printf("all memory used by pointers manager structure:%u\n", getAllUsedMemorySize());
 
     printf("main program is running...\n");
-
-    //endPointerManager();
+/*
+    if (endPointerManager() == FALSE)
+    {
+        printf("End pointer manager failure.\n");
+    }
+    else
+    {
+        printf("Succesful end pointer manager.\n");
+    }
+*/
     printf("pointers manager deinitialized.\n");
 
     return 0;

@@ -73,7 +73,7 @@ void Logger(const eLog_t type, const char *status, const char *text, const char 
 		printf("ERROR: File:%s  Line:%d  Function:%s\n", __FILE__, __LINE__, __ASSERT_FUNCTION); \
 	}
 
-#else
+#else //!< Do nothing
 
 	#define ASSERT(x) (void)0
 
