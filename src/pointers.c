@@ -70,9 +70,9 @@ bool_t endPointerManager(void)
 
    bool_t res = TRUE;
 
-   for (u16_t idx = 1; idx < ptr[0].size; idx++)
+   for (u16_t hnd = 1; hnd < ptr[0].size; hnd++)
    {
-      if (freeMemory(idx) == FALSE)
+      if (freeMemory(hnd) == FALSE)
       {
          ERROR("Memory couldn't be free.");
          res = FALSE;
@@ -106,16 +106,24 @@ u16_t allocMemory(const u16_t size)
       return (hnd);
    }
 
-   for (u16_t idx = 1; idx < ptr[0].size; idx++)
+   //Search for a free handle position
+   for (u16_t hnd_pos = 1; hnd_pos < ptr[0].size; hnd_pos++)
    {
-      if (isFree(idx))
+      if (isFree(hnd_pos))
       {
-         ptr[idx].ptr = CALLOC(size);
+         //Found a free handle position.
 
-         if (ptr[idx].ptr != NULL)
+         ptr[hnd_pos].ptr = CALLOC(size);
+
+         //Check allocation memory
+         if (ptr[hnd_pos].ptr != NULL)
          {
-            ptr[idx].size = size;
-            hnd = idx;
+            //Sucessful allocation memory,
+            //store the amount of memory and save the handle position.
+            ptr[hnd_pos].size = size;
+            hnd = hnd_pos;
+
+            //Stop looping iteration and return the index number as a handle position.
             break;
          }
       }
@@ -206,6 +214,8 @@ bool_t isPointerValid(const u16_t hnd)
       return (FALSE);
    }
 
+   //Return true for memory size greater than zero and
+   //memory allocation successful attempted.
    return ((ptr[hnd].size > 0) && (ptr[hnd].ptr != NULL));
 }
 
