@@ -13,10 +13,10 @@
 #include "defs.h"
 
 #ifdef DEBUG
-//#define DEBUG0	1	//!< Disabled debug check.
-//#define DEBUG1	1	//!< Parameters check.
-//#define DEBUG2	1	//!< Parameters and variable value check.
-//#define DEBUG3	1	//!< Parameters and variable value check.
+//#define DEBUG0	1  //!< Disabled debug check.
+//#define DEBUG1	1  //!< Parameters check.
+//#define DEBUG2	1  //!< Parameters and variable value check.
+//#define DEBUG3	1  //!< Parameters and variable value check.
 #endif
 
 /**
@@ -24,11 +24,11 @@
  */
 typedef enum
 {
-	LOG,
-	INF,
-	WRN,
-	ERR,
-	BAD
+   LOG,
+   INF,
+   WRN,
+   ERR,
+   BAD
 } eLog_t;
 
 void Logger(const eLog_t type, const char *status, const char *text, const char *file, const int line, const char *function);
@@ -44,38 +44,38 @@ void Logger(const eLog_t type, const char *status, const char *text, const char 
  */
 #if defined (DEBUG3)	//!< Enable assert directive
 
-	#define ASSERT(x) assert(x)
+   #define ASSERT(x) assert(x)
 
 #elif defined (DEBUG2)	//!< Send to stderr for debug and exit
 
-	#define ASSERT(x) \
-	if (!(x)) \
-	{ \
-		fprintf(stderr, "ERROR: File:%s  Line:%d  Function:%s\n", __FILE__, __LINE__, __ASSERT_FUNCTION ); \
-		fflush( stderr ); \
-		exit(EXIT_FAILURE); \
-	}
+   #define ASSERT(x) \
+   if (!(x)) \
+   { \
+      fprintf(stderr, "ERROR: File:%s  Line:%d  Function:%s\n", __FILE__, __LINE__, __ASSERT_FUNCTION ); \
+      fflush( stderr ); \
+      exit(EXIT_FAILURE); \
+   }
 
 #elif defined (DEBUG1)	//!< Print to console for debug and exit
 
-	#define ASSERT(x) \
-	if(! (x)) \
-	{ \
-		printf("ERROR: File:%s  Line:%d  Function:%s\n", __FILE__, __LINE__, __ASSERT_FUNCTION); \
-		exit (EXIT_FAILURE); \
-	}
+   #define ASSERT(x) \
+   if(! (x)) \
+   { \
+      printf("ERROR: File:%s  Line:%d  Function:%s\n", __FILE__, __LINE__, __ASSERT_FUNCTION); \
+      exit (EXIT_FAILURE); \
+   }
 
 #elif defined (DEBUG0)	//!< Print to console for debug and continue running
 
-	#define ASSERT(x) \
-	if(! (x)) \
-	{ \
-		printf("ERROR: File:%s  Line:%d  Function:%s\n", __FILE__, __LINE__, __ASSERT_FUNCTION); \
-	}
+   #define ASSERT(x) \
+   if(! (x)) \
+   { \
+      printf("ERROR: File:%s  Line:%d  Function:%s\n", __FILE__, __LINE__, __ASSERT_FUNCTION); \
+   }
 
 #else //!< Do nothing
 
-	#define ASSERT(x) (void)0
+   #define ASSERT(x) (void)0
 
 #endif
 
