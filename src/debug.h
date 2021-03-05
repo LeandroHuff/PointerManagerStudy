@@ -12,11 +12,20 @@
 #include <assert.h>
 #include "defs.h"
 
+/**
+ * @brief DEBUG macro is a set of debug levels that can be enabled for a
+ *        specific debug assert and logger behavior to catch failures and trace
+ *        program data execution.
+ *
+ *        Each debug level line should be enabled (uncommented) only one of them
+ *        and remains the others disabled by doing them as a commented line.
+ *
+ *        if no one are enabled, only logger message are sent to console stderr or stdout.
+ */
 #ifdef DEBUG
-//#define DEBUG0	1  //!< Disabled debug check.
-//#define DEBUG1	1  //!< Parameters check.
-//#define DEBUG2	1  //!< Parameters and variable value check.
-//#define DEBUG3	1  //!< Parameters and variable value check.
+//#define DEBUG0	1  //!< Assert send a log message to debug console and continue running program.
+//#define DEBUG1	1  //!< Assert send a log message to debug console and stop running program.
+#define DEBUG2	1  //!< Assert abort program execution and print programm trace information.
 #endif
 
 /**
@@ -42,35 +51,25 @@ void Logger(const eLog_t type, const char *status, const char *text, const char 
 /**
  * @brief Macro to use assert diretive on debug mode.
  */
-#if defined (DEBUG3)	//!< Enable assert directive
+#if defined (DEBUG2)	//!< Enable assert trace fault
 
    #define ASSERT(x) assert(x)
-
-#elif defined (DEBUG2)	//!< Send to stderr for debug and exit
-
-   #define ASSERT(x) \
-   if (!(x)) \
-   { \
-      fprintf(stderr, "ERROR: File:%s  Line:%d  Function:%s\n", __FILE__, __LINE__, __ASSERT_FUNCTION ); \
-      fflush( stderr ); \
-      exit(EXIT_FAILURE); \
-   }
 
 #elif defined (DEBUG1)	//!< Print to console for debug and exit
 
    #define ASSERT(x) \
-   if(! (x)) \
+   if(!(x)) \
    { \
-      printf("ERROR: File:%s  Line:%d  Function:%s\n", __FILE__, __LINE__, __ASSERT_FUNCTION); \
+      ERROR(""); \
       exit (EXIT_FAILURE); \
    }
 
 #elif defined (DEBUG0)	//!< Print to console for debug and continue running
 
    #define ASSERT(x) \
-   if(! (x)) \
+   if(!(x)) \
    { \
-      printf("ERROR: File:%s  Line:%d  Function:%s\n", __FILE__, __LINE__, __ASSERT_FUNCTION); \
+      ERROR(""); \
    }
 
 #else //!< Do nothing

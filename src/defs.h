@@ -2,6 +2,7 @@
 #define DEFS_H
 
 #include <stdlib.h>
+#include <string.h>
 
 /**
  * @brief   Embedded user type declaration from 8-bit up to 64-bit

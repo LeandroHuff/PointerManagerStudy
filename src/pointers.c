@@ -114,18 +114,26 @@ u16_t allocMemory(const u16_t size)
          //Found a free handle position.
 
          ptr[hnd_pos].ptr = CALLOC(size);
+         ASSERT(ptr[hnd_pos].ptr != NULL);
 
-         //Check allocation memory
-         if (ptr[hnd_pos].ptr != NULL)
+         if (ptr[hnd_pos].ptr == NULL)
          {
-            //Sucessful allocation memory,
-            //store the amount of memory and save the handle position.
-            ptr[hnd_pos].size = size;
-            hnd = hnd_pos;
-
-            //Stop looping iteration and return the index number as a handle position.
-            break;
+            DEF_BUFFER(char, msg, 128);
+            snprintf(msg,
+                     sizeof(msg),
+                     "Memory allocation failure for handle at position %u!",
+                     hnd_pos);
+            ERROR(msg);
+            return (hnd);
          }
+
+         //Sucessful allocation memory,
+         //store size of allocated memory and save the handle position.
+         ptr[hnd_pos].size = size;
+         hnd = hnd_pos;
+
+         //Stop looping iteration and return the index number as a handle position.
+         break;
       }
    }
 
@@ -285,11 +293,15 @@ bool_t memCopyTo(u8_t  *pdata,
       return (FALSE);
    }
 
+   ASSERT((offset_orig + data_size) <= size_orig);
+   ASSERT((offset_dest + data_size) <= ptr[hnd].size);
+
    if ((offset_orig + data_size) > size_orig)
    {
       ERROR("Overflow on source buffer.");
       return (FALSE);
    }
+
 
    if ((offset_dest + data_size) > ptr[hnd].size)
    {

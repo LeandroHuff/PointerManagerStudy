@@ -66,6 +66,22 @@ int main(int argc, char **argv)
    printf("all memory used by pointers manager structure:%u\n", getAllUsedMemorySize());
 
    printf("main program is running...\n");
+
+
+   DEF_BUFFER(u8_t, buf_origin, 512);
+
+   //Fill buffer with letter 'c'
+   memset(buf_origin, 'c', sizeof(buf_origin));
+
+   result = memCopyTo(buf_origin,         /*Buffer from where data gonna be copied.*/
+                      sizeof(buf_origin), /*Buffer size, note that it is greater than destine buffer (128) at line 48.*/
+                      0,                  /*Offset of origin buffer.*/
+                      sizeof(buf_origin), /*Amount data size to be copied, it is an error because is greater than destine.*/
+                      hndPointer,         /*Handle number where the data gonna be copied.*/
+                      0);                 /*Offset of destine buffer.*/
+
+   ASSERT(result == TRUE);
+
    /*
     if (endPointerManager() == FALSE)
     {
